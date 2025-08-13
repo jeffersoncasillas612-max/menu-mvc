@@ -1,10 +1,10 @@
 <?php
 class Database {
-    private $localhost = "localhost";
-    private $puerto = "3306";
-    private $database = "hospital"; // Cámbialo si tu nueva BD se llama diferente
+    private $localhost = "mysql.railway.internal";
+    private $puerto = "41946";
+    private $database = "railway"; // Cámbialo si tu nueva BD se llama diferente
     private $username = "root";
-    private $password = "";
+    private $password = "tIdYJBctwsMnBZKVmojqvzqReSbQzkdc";
     public $conn;
 
     public function getConnection() {
