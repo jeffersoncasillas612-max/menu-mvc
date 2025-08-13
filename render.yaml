@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: menu-mvc-app
+    env: php
+    buildCommand: ""
+    startCommand: ""
+    plan: free
