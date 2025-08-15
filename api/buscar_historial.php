@@ -28,12 +28,23 @@ if (!$paciente) {
 
 $paciente_id = $paciente['usu_id'];
 
+// Consultas
+$info_paciente = $modelo->obtenerInformacionPaciente($paciente_id);
+$historial = $modelo->obtenerHistorialClinico($paciente_id);
+$vacunas = $modelo->obtenerVacunas($paciente_id);
+$citas = $modelo->obtenerCitasPorPaciente($paciente_id);
+
+// Respuestas si no existen
+$historial = $historial ?: "No se encontraron datos de historial clínico";
+$vacunas = !empty($vacunas) ? $vacunas : "No se encontraron vacunas registradas";
+$citas = !empty($citas) ? $citas : "No se encontraron citas registradas";
+
 $response = [
     "estado" => "ok",
-    "paciente" => $modelo->obtenerInformacionPaciente($paciente_id),
-    "historial" => $modelo->obtenerHistorialClinico($paciente_id),
-    "vacunas" => $modelo->obtenerVacunas($paciente_id),
-    "citas" => $modelo->obtenerCitasPorPaciente($paciente_id)
+    "paciente" => $info_paciente,
+    "historial" => $historial,
+    "vacunas" => $vacunas,
+    "citas" => $citas
 ];
 
 echo json_encode($response, JSON_UNESCAPED_UNICODE);
