@@ -28,8 +28,8 @@ try {
     }
 
     // Conectar BD
-    $conexion = (new Database())->getConnection();
-    $modeloCita = new Cita($conexion);
+    $modeloCita = new Cita(); // ✅ SIN pasar parámetros
+
 
     // Obtener datos
     $citas = $modeloCita->obtenerCitasPorMedicoYRango(
