@@ -309,7 +309,7 @@ class Cita {
                     es.nombre AS especialidad,
                     p.nombre AS prioridad,
                     o.nombre AS origen
-                FROM citas c
+                FROM cita c
                 INNER JOIN usuarios u ON c.paciente_id = u.usu_id
                 INNER JOIN estados e ON c.estado_id = e.estado_id
                 INNER JOIN tipo_cita tc ON c.tipo_cita_id = tc.tipo_cita_id
