@@ -301,32 +301,33 @@ class Cita {
     
 
     public function obtenerCitasPorMedicoYRango($medico_id, $inicio, $fin) {
-        $sql = "SELECT c.*, 
-                    u.usu_nombre AS nombre_paciente, 
-                    u.usu_apellido AS apellido_paciente,
-                    e.nombre AS estado_nombre,
-                    tc.nombre AS tipo_cita,
-                    es.nombre AS especialidad,
-                    p.nombre AS prioridad,
-                    o.nombre AS origen
-                FROM cita c
-                INNER JOIN usuarios u ON c.paciente_id = u.usu_id
-                INNER JOIN estados e ON c.estado_id = e.estado_id
-                INNER JOIN tipo_cita tc ON c.tipo_cita_id = tc.tipo_cita_id
-                INNER JOIN especialidades es ON c.especialidad_id = es.especialidad_id
-                INNER JOIN prioridades p ON c.prioridad_id = p.prioridad_id
-                INNER JOIN origenes o ON c.origen_id = o.origen_id
-                WHERE c.medico_id = :medico_id 
-                AND c.fecha BETWEEN :inicio AND :fin
-                ORDER BY c.fecha DESC";
+    $sql = "SELECT c.*, 
+                u.usu_nombre AS nombre_paciente, 
+                u.usu_apellido AS apellido_paciente,
+                ec.nombre AS estado_nombre,
+                tc.nombre AS tipo_cita,
+                es.nombre AS especialidad,
+                p.nombre AS prioridad,
+                o.nombre AS origen
+            FROM cita c
+            INNER JOIN usuarios u ON c.paciente_id = u.usu_id
+            INNER JOIN estado_cita ec ON c.estado_id = ec.estado_id
+            INNER JOIN tipo_cita tc ON c.tipo_cita_id = tc.tipo_cita_id
+            INNER JOIN especialidad es ON c.especialidad_id = es.especialidad_id
+            INNER JOIN prioridad p ON c.prioridad_id = p.prioridad_id
+            INNER JOIN origen_cita o ON c.origen_id = o.origen_id
+            WHERE c.medico_id = :medico_id 
+            AND c.fecha BETWEEN :inicio AND :fin
+            ORDER BY c.fecha DESC";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':medico_id', $medico_id, PDO::PARAM_INT);
-        $stmt->bindParam(':inicio', $inicio);
-        $stmt->bindParam(':fin', $fin);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':medico_id', $medico_id, PDO::PARAM_INT);
+    $stmt->bindParam(':inicio', $inicio);
+    $stmt->bindParam(':fin', $fin);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 
 
