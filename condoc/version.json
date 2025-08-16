@@ -1,9 +1,9 @@
 {
   "android": {
-    "versionName": "1.0.1",
-    "versionCode": 2,
-    "minSupported": 1,
-    "apkUrl": "https://github.com/jeffersoncasillas612-max/ConDoc/releases/download/v1.0.1/ConDoc-1.0.1.apk",
-    "changelog": "- Corrección del ícono de la app"
+    "versionName": "1.0.2",
+    "versionCode": 3,
+    "minSupported": 3,
+    "apkUrl": "https://github.com/jeffersoncasillas612-max/ConDoc/releases/download/v1.0.2/ConDoc-1.0.2.apk",
+    "changelog": "- Creacion de permisos para los Tester"
   }
 }
