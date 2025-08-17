@@ -196,38 +196,50 @@
 
     </div>
 
-    <script>
-  // Botón dinámico de descarga (lee el JSON público en Render)
+<script>
   (async () => {
     try {
-      // MISMA ORIGEN: si tu login se sirve en menu-mvc.onrender.com, basta ruta relativa:
-      const url = "/condoc/version.json?ts=" + Date.now(); // evita caché
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch("/condoc/version.json?ts=" + Date.now(), { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
 
       const android = data?.android;
       if (!android || !android.apkUrl) throw new Error("Sin campos android/apkUrl");
 
-      // Rellena botón
       const link = document.getElementById("apkLink");
       const ver  = document.getElementById("apkVersion");
       const log  = document.getElementById("apkChangelog");
 
       link.href = android.apkUrl;
       ver.textContent = android.versionName ? `(v${android.versionName})` : "";
-      if (android.changelog) {
-        log.textContent = android.changelog.replaceAll("\\n", " · ");
+
+      // ---- render de changelog en varias líneas ----
+      const esc = s => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[m]));
+      let lines = [];
+
+      if (Array.isArray(android.changelog)) {
+        lines = android.changelog.map(s => String(s));
+      } else if (typeof android.changelog === "string") {
+        lines = android.changelog.split(/\r?\n/).map(s => s.replace(/^\s*-\s*/, "").trim()).filter(Boolean);
       }
+
+      if (lines.length) {
+        log.innerHTML = `<ul style="margin:6px 0 0 18px;padding:0;">${
+          lines.map(s => `<li>${esc(s)}</li>`).join("")
+        }</ul>`;
+      } else {
+        log.textContent = ""; // sin notas
+      }
+      // ----------------------------------------------
 
       document.getElementById("appDownload").hidden = false;
     } catch (e) {
-      // Fallback visible si falla el fetch o el JSON
       document.getElementById("appDownloadFallback").hidden = false;
       console.error("Descarga APK:", e);
     }
   })();
 </script>
+
 
 
     <script>
