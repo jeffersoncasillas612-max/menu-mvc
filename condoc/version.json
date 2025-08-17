@@ -5,9 +5,9 @@
     "minSupported": 4,
     "apkUrl": "https://github.com/jeffersoncasillas612-max/ConDoc/releases/download/v1.0.3/ConDoc-1.0.3.apk",
     "changelog": [
-      "-Corrección para que las acciones con permisos aparezcan en el Home",
-      "-Mejoras de rendimiento en la pantalla de inicio",
-      "-Ajuste menor en el icono"
+      "Corrección para que las acciones con permisos aparezcan en el Home",
+      "Mejoras de rendimiento en la pantalla de inicio",
+      "Ajuste menor en el icono"
     ]
   }
 }

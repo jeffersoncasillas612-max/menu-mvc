@@ -129,7 +129,7 @@
 
 .btn-download {
     display: inline-flex;
-    align-items: center;
+    align-items: left;
     gap: 8px;
     padding: 12px 14px;
     background: #16a34a;              /* verde */
