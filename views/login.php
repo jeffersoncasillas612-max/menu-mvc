@@ -120,6 +120,38 @@
                 padding: 20px 15px;
             }
         }
+
+        /* --- Descargar App --- */
+.download-app { 
+    margin-top: 16px; 
+    text-align: center;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #16a34a;              /* verde */
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity .2s ease;
+}
+.btn-download:hover { opacity: .9; }
+
+.btn-download small {
+    font-weight: 600;
+    opacity: .9;
+}
+
+.download-error {
+    margin-top: 8px;
+    font-size: .9rem;
+    color: #b91c1c;                    /* rojo suave */
+}
+
     </style>
 </head>
 <body>
@@ -141,7 +173,62 @@
                 <a href="index.php?vista=<?= base64_encode('usuarios/olvide_contrasena.php') ?>">¿Olvidaste tu contraseña?</a>
             </div>
         </form>
+
+        <hr style="margin:18px 0;border:none;border-top:1px solid #eee">
+
+<div class="download-app" id="appDownload" hidden>
+  <a id="apkLink" class="btn-download" href="#" target="_blank" rel="noopener">
+    <i class="fa-brands fa-android"></i>
+    Descargar app Android <small id="apkVersion"></small>
+  </a>
+  <div id="apkChangelog" style="margin-top:6px;color:#555;font-size:.9rem;"></div>
+</div>
+
+<div class="download-app download-error" id="appDownloadFallback" hidden>
+  No se pudo obtener la descarga automática.
+  <a href="https://github.com/jeffersoncasillas612-max/ConDoc/releases" target="_blank" rel="noopener">
+    Ir a lanzamientos
+  </a>
+</div>
+
+
+
+
     </div>
+
+    <script>
+  // Botón dinámico de descarga (lee el JSON público en Render)
+  (async () => {
+    try {
+      // MISMA ORIGEN: si tu login se sirve en menu-mvc.onrender.com, basta ruta relativa:
+      const url = "/condoc/version.json?ts=" + Date.now(); // evita caché
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+
+      const android = data?.android;
+      if (!android || !android.apkUrl) throw new Error("Sin campos android/apkUrl");
+
+      // Rellena botón
+      const link = document.getElementById("apkLink");
+      const ver  = document.getElementById("apkVersion");
+      const log  = document.getElementById("apkChangelog");
+
+      link.href = android.apkUrl;
+      ver.textContent = android.versionName ? `(v${android.versionName})` : "";
+      if (android.changelog) {
+        log.textContent = android.changelog.replaceAll("\\n", " · ");
+      }
+
+      document.getElementById("appDownload").hidden = false;
+    } catch (e) {
+      // Fallback visible si falla el fetch o el JSON
+      document.getElementById("appDownloadFallback").hidden = false;
+      console.error("Descarga APK:", e);
+    }
+  })();
+</script>
+
 
     <script>
         const togglePassword = document.getElementById("togglePassword");
