@@ -1,9 +1,9 @@
 {
   "android": {
-    "versionName": "1.0.2",
-    "versionCode": 3,
-    "minSupported": 3,
-    "apkUrl": "https://github.com/jeffersoncasillas612-max/ConDoc/releases/download/v1.0.2/ConDoc-1.0.2.apk",
-    "changelog": "- Creacion de permisos para los Tester"
+    "versionName": "1.0.3",
+    "versionCode": 4,
+    "minSupported": 4,
+    "apkUrl": "https://github.com/jeffersoncasillas612-max/ConDoc/releases/download/v1.0.3/ConDoc-1.0.3.apk",
+    "changelog": "- Correecion para que las acciones que tienes permisos aparescan en el Home"
   }
 }
