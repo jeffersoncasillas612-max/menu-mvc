@@ -32,11 +32,15 @@ try {
 
 
     // Obtener datos
+    $fecha_inicio = $datos['fecha_inicio'] . ' 00:00:00';
+    $fecha_fin = $datos['fecha_fin'] . ' 23:59:59';
+
     $citas = $modeloCita->obtenerCitasPorMedicoYRango(
         $datos['medico_id'],
-        $datos['fecha_inicio'],
-        $datos['fecha_fin']
+        $fecha_inicio,
+        $fecha_fin
     );
+
 
     echo json_encode([
         'estado' => 'ok',
