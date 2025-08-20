@@ -1,4 +1,6 @@
 <?php
+use Dotenv\Dotenv;
+
 class Database {
     private $localhost;
     private $puerto;
@@ -8,6 +10,15 @@ class Database {
     public $conn;
 
     public function __construct() {
+        // 1. Cargar dotenv solo si existe archivo local
+        $envPath = __DIR__ . '/../'; // ajusta la ruta según dónde esté tu .env
+        if (file_exists($envPath . '.env')) {
+            require_once __DIR__ . '/../vendor/autoload.php';
+            $dotenv = Dotenv::createImmutable($envPath);
+            $dotenv->load();
+        }
+
+        // 2. Leer variables (si no existen, Render ya las inyecta desde su panel)
         $this->localhost = getenv("DB_HOST");
         $this->puerto    = getenv("DB_PORT");
         $this->database  = getenv("DB_DATABASE");
@@ -29,4 +40,3 @@ class Database {
         return $this->conn;
     }
 }
-?>
