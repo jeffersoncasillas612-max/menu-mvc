@@ -19,16 +19,6 @@ try {
     $rol_id = $input['rol_id'] ?? null;
     $especialidad_id = $input['especialidad_id'] ?? null;
 
-    // Validar lógica de especialidad
-    if ($rol_id != 31 && !empty($especialidad_id)) {
-        echo json_encode([
-            'estado' => 'error',
-            'msg' => 'Solo los usuarios con rol de médico (rol_id = 31) pueden tener especialidad.'
-        ]);
-        exit;
-    }
-
-
     // Validación básica
     if (!$nombre || !$apellido || !$correo || !$cedula || !$rol_id) {
         echo json_encode(['estado' => 'error', 'msg' => 'Todos los campos son obligatorios']);
@@ -41,9 +31,6 @@ try {
         echo json_encode(['estado' => 'error', 'msg' => 'La cédula o correo ya están registrados.']);
         exit;
     }
-
-    
-
 
     // Crear usuario
     $creado = $usuario->crear($nombre, $apellido, $correo, $cedula, $rol_id, $especialidad_id);
