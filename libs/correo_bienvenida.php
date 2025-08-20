@@ -2,9 +2,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once __DIR__ . '/PHPMailer/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer/SMTP.php';
-require_once __DIR__ . '/PHPMailer/Exception.php';
+require_once __DIR__ . '/libs/PHPMailer/PHPMailer.php';
+require_once __DIR__ . '/libs/PHPMailer/SMTP.php';
+require_once __DIR__ . '/libs/PHPMailer/Exception.php';
 
 function enviarCorreoBienvenida($correoDestino, $nombreCompleto, $cedula) {
     $primerNombre = explode(' ', $nombreCompleto)[0];

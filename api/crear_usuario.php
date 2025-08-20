@@ -1,65 +1,53 @@
 <?php
-// 📄 API para crear un usuario (paciente, médico, etc.)
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-
+header('Content-Type: application/json');
+require_once '../config/database.php';
 require_once '../models/Usuario.php';
-require_once '../libs/correo_bienvenida.php'; // ✅ Importante
+require_once '../libs/correo_bienvenida.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(["estado" => "error", "msg" => "Método no permitido"]);
-    exit;
-}
+try {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['estado' => 'error', 'msg' => 'Método no permitido']);
+        exit;
+    }
 
-// 📥 Leer datos del cuerpo JSON
-$datos = json_decode(file_get_contents("php://input"), true);
+    $input = json_decode(file_get_contents('php://input'), true);
+    $nombre = trim($input['nombre'] ?? '');
+    $apellido = trim($input['apellido'] ?? '');
+    $correo = trim($input['correo'] ?? '');
+    $cedula = trim($input['cedula'] ?? '');
+    $rol_id = $input['rol_id'] ?? null;
+    $especialidad_id = $input['especialidad_id'] ?? null;
 
-// 📌 Validar campos obligatorios
-$nombre = trim($datos['nombre'] ?? '');
-$apellido = trim($datos['apellido'] ?? '');
-$correo = trim($datos['correo'] ?? '');
-$cedula = trim($datos['cedula'] ?? '');
-$rol_id = intval($datos['rol_id'] ?? 0);
-$especialidad_id = $datos['especialidad_id'] ?? null;
+    // Validación básica
+    if (!$nombre || !$apellido || !$correo || !$cedula || !$rol_id) {
+        echo json_encode(['estado' => 'error', 'msg' => 'Todos los campos son obligatorios']);
+        exit;
+    }
 
-// 🔍 Validación básica
-if (!$nombre || !$apellido || !$correo || !$cedula || !$rol_id) {
-    http_response_code(400);
-    echo json_encode(["estado" => "error", "msg" => "Faltan campos requeridos"]);
-    exit;
-}
+    // Validar duplicado
+    $usuario = new Usuario();
+    if ($usuario->existeCedulaOCorreo($cedula, $correo)) {
+        echo json_encode(['estado' => 'error', 'msg' => 'La cédula o correo ya están registrados.']);
+        exit;
+    }
 
-// 👨‍⚕️ Validar especialidad si es médico
-if ($rol_id == 31 && empty($especialidad_id)) {
-    http_response_code(400);
-    echo json_encode(["estado" => "error", "msg" => "La especialidad es obligatoria para médicos"]);
-    exit;
-}
+    // Crear usuario
+    $creado = $usuario->crear($nombre, $apellido, $correo, $cedula, $rol_id, $especialidad_id);
 
-// 👮 Verificar duplicado
-$modelo = new Usuario();
-if ($modelo->existeCedulaOCorreo($cedula, $correo)) {
-    http_response_code(409); // conflicto
-    echo json_encode(["estado" => "error", "msg" => "La cédula o correo ya están registrados"]);
-    exit;
-}
+    if ($creado) {
+        // Enviar correo de bienvenida
+        $correoEnviado = enviarCorreoBienvenida($correo, "$nombre $apellido", $cedula);
 
-// 🛠️ Crear usuario
-$exito = $modelo->crear($nombre, $apellido, $correo, $cedula, $rol_id, $especialidad_id);
-
-if ($exito) {
-    // 📧 Enviar correo de bienvenida
-    enviarCorreoBienvenida($correo, $nombre, $cedula);
-
-    echo json_encode([
-        "estado" => "ok",
-        "msg" => "Usuario creado correctamente"
-    ]);
-} else {
+        echo json_encode([
+            'estado' => 'ok',
+            'msg' => 'Usuario creado correctamente',
+            'correo_enviado' => $correoEnviado
+        ]);
+    } else {
+        echo json_encode(['estado' => 'error', 'msg' => 'No se pudo crear el usuario']);
+    }
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode([
-        "estado" => "error",
-        "msg" => "No se pudo registrar el usuario"
-    ]);
+    echo json_encode(['estado' => 'error', 'msg' => 'Error interno: ' . $e->getMessage()]);
 }
