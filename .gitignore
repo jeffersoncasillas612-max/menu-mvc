@@ -1,3 +1,4 @@
 # Ignorar archivo de entorno local
 .env
 
+test_db.php
