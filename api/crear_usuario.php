@@ -32,6 +32,17 @@ try {
         exit;
     }
 
+    // Validar lógica de especialidad
+    if ($rol_id != 31 && !empty($especialidad_id)) {
+        echo json_encode([
+            'estado' => 'error',
+            'msg' => 'Solo los usuarios con rol de médico (rol_id = 31) pueden tener especialidad.'
+        ]);
+        exit;
+    }
+
+
+
     // Crear usuario
     $creado = $usuario->crear($nombre, $apellido, $correo, $cedula, $rol_id, $especialidad_id);
 
