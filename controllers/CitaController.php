@@ -91,7 +91,7 @@ class CitaController {
                             // URL pública de triaje (ajusta dominio/ruta cuando la tengas lista)
                             $tele = [
                                 'meeting_url' => $meetUrl,
-                                'triage_url'  => 'http://localhost:4060/MenuMVC/views/tele/triage.php?token=' . $token
+                                'triage_url'  => 'https://menu-mvc.onrender.com/views/tele/triage.php?token=' . $token
                             ];
                         } catch (\Throwable $e) {
                             // No detengas el flujo si algo de "tele" falla
