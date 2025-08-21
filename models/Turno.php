@@ -40,12 +40,12 @@ class Turno {
 
 
     // models/Turno.php
-public function eliminarTodosPorMedico($medico_id) {
-    $sql = "DELETE FROM turno WHERE medico_id = :medico_id";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->bindParam(':medico_id', $medico_id, PDO::PARAM_INT);
-    return $stmt->execute();
-}
+    public function eliminarTodosPorMedico($medico_id) {
+        $sql = "DELETE FROM turno WHERE medico_id = :medico_id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':medico_id', $medico_id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 
     
 }
