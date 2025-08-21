@@ -120,6 +120,20 @@ class Usuario {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? $row['usu_correo'] : null;
     }
+
+    // models/Usuario.php
+    public function obtenerPorId(int $id): ?array {
+        $sql = "SELECT usu_id, rol_id, usu_nombre, usu_apellido, usu_correo
+                FROM usuarios
+                WHERE usu_id = :id
+                LIMIT 1";
+        $st = $this->conn->prepare($sql);
+        $st->bindValue(':id', $id, PDO::PARAM_INT);
+        $st->execute();
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
     
     
     

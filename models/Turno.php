@@ -1,5 +1,5 @@
 <?php
-require_once 'config/database.php';
+require_once dirname(__DIR__) . '/config/database.php';
 
 class Turno {
     private $conn;
@@ -37,5 +37,15 @@ class Turno {
         return $stmt->execute();
     }
     
+
+
+    // models/Turno.php
+public function eliminarTodosPorMedico($medico_id) {
+    $sql = "DELETE FROM turno WHERE medico_id = :medico_id";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':medico_id', $medico_id, PDO::PARAM_INT);
+    return $stmt->execute();
+}
+
     
 }

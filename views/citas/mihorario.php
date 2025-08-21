@@ -2,6 +2,10 @@
 include 'views/layouts/header.php';
 require_once 'models/Turno.php';
 
+$rolUsuario = (int)($_SESSION['usuario']['rol_id'] ?? 0);
+$esMedico   = ($rolUsuario === 31); // ajusta si tu rol de médico es otro
+
+
 $medico_id = $_SESSION['usuario']['usu_id'] ?? null;
 $turnos = [];
 
@@ -112,16 +116,19 @@ function hayAtencion($turnosDia, $hora) {
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4><i class="fas fa-calendar-alt me-2"></i>Horario Semanal</h4>
-        <?php if (!empty($diasDisponibles)): ?>
+        <?php if (!$esMedico && !empty($diasDisponibles)): ?>
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalHorario">
                 <i class="fas fa-plus"></i> Registrar horario
             </button>
+        <?php elseif ($esMedico): ?>
+            <!-- Médico: sin botón -->
         <?php else: ?>
-            <button class="btn btn-secondary" disabled>
+        <button class="btn btn-secondary" disabled>
                 <i class="fas fa-ban"></i> Días completos
             </button>
         <?php endif; ?>
     </div>
+
 
     <div class="card shadow-sm">
         <div class="card-body p-0">

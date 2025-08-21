@@ -2,6 +2,20 @@
 require_once 'models/Turno.php';
 
 class TurnoController {
+
+
+    /** Solo permiten acciones a NO-médicos (admin/secretaría) */
+    private function exigirNoMedico(): void {
+        $rol = (int)($_SESSION['usuario']['rol_id'] ?? 0);
+        if ($rol === 31) { // 31 = médico (ajusta si tu rol difiere)
+            http_response_code(403);
+            echo "No autorizado";
+            exit;
+        }
+    }
+
+
+
     public function miHorario() {
         if (!isset($_SESSION['usuario'])) {
             echo "Acceso no autorizado";
