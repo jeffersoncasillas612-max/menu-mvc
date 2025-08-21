@@ -134,6 +134,22 @@ class Usuario {
         return $row ?: null;
     }
 
+    public function obtenerPacientePorCedula(string $cedula): ?array {
+        $sql = "SELECT 
+                    usu_id, rol_id, usu_nombre, usu_apellido, usu_correo,
+                    usu_cedula AS cedula
+                FROM usuarios
+                WHERE usu_cedula = :ced
+                LIMIT 1";
+        $st = $this->conn->prepare($sql);
+        $st->bindValue(':ced', $cedula, PDO::PARAM_STR);
+        $st->execute();
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+
+
     
     
     
