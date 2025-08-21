@@ -189,7 +189,9 @@ class Cita {
         $sql = "SELECT 
                     c.*, 
                     CONCAT(p.usu_nombre, ' ', p.usu_apellido) AS paciente,
+                    p.usu_correo AS paciente_correo,        -- 👈 añade esto
                     CONCAT(m.usu_nombre, ' ', m.usu_apellido) AS medico,
+                    m.usu_correo AS medico_correo,          -- (opcional)
                     esp.nombre AS especialidad,
                     pr.nombre AS prioridad,
                     o.nombre AS origen,
@@ -209,6 +211,7 @@ class Cita {
         $stmt->execute([$cita_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
 
     public function obtenerInformacionPaciente($paciente_id)
     {
