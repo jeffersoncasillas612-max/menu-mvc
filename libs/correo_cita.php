@@ -2,11 +2,18 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once 'libs/PHPMailer/PHPMailer.php';
-require_once 'libs/PHPMailer/SMTP.php';
-require_once 'libs/PHPMailer/Exception.php';
+// RUTAS ABSOLUTAS (no cambies si tienes esta estructura)
+require_once __DIR__ . '/PHPMailer/PHPMailer.php';
+require_once __DIR__ . '/PHPMailer/SMTP.php';
+require_once __DIR__ . '/PHPMailer/Exception.php';
 
-function enviarCorreoCita($correoDestino, $nombrePaciente, $datosCita, $creadoPor) {
+/**
+ * $tele (opcional): [
+ *   'meeting_url' => 'https://meet.jit.si/...',
+ *   'triage_url'  => 'https://tu-dominio/tele/triage.php?token=...'
+ * ]
+ */
+function enviarCorreoCita($correoDestino, $nombrePaciente, $datosCita, $creadoPor, $tele = null) {
     $mail = new PHPMailer(true);
 
     try {
@@ -25,14 +32,33 @@ function enviarCorreoCita($correoDestino, $nombrePaciente, $datosCita, $creadoPo
         $mail->Subject = 'Cita médica registrada';
 
         // Variables con valores seguros
-        $fechaHora    = date("d/m/Y H:i", strtotime($datosCita['fecha']));
+        $fechaHora    = isset($datosCita['fecha']) ? date("d/m/Y H:i", strtotime($datosCita['fecha'])) : 'S/F';
         $especialidad = $datosCita['especialidad'] ?? 'No especificado';
         $medico       = $datosCita['medico'] ?? 'No asignado';
         $tipoCita     = $datosCita['tipo_cita'] ?? 'No especificado';
         $prioridad    = $datosCita['prioridad'] ?? 'No especificada';
         $motivo       = $datosCita['motivo'] ?? 'Sin motivo registrado';
 
-        // Diseño moderno
+        // Bloque adicional SOLO si es telecita
+        $bloqueTele = '';
+        if (is_array($tele)) {
+            $meeting = htmlspecialchars($tele['meeting_url'] ?? '', ENT_QUOTES, 'UTF-8');
+            $triage  = htmlspecialchars($tele['triage_url']  ?? '', ENT_QUOTES, 'UTF-8');
+
+            if ($meeting || $triage) {
+                $bloqueTele = "
+                <div style='margin-top:20px;padding:15px;background:#eef7ff;border-radius:8px;border:1px solid #cfe8ff'>
+                    <h3 style='margin:0 0 10px 0;'>Consulta en línea</h3>"
+                    . ($triage ? "<p style='margin:6px 0;'>📝 Completa tu triaje aquí: <a href='{$triage}' target='_blank'>Formulario de triaje</a></p>" : "") .
+                    ($meeting ? "<p style='margin:6px 0;'>🎥 Videollamada: <a href='{$meeting}' target='_blank'>{$meeting}</a></p>" : "") .
+                    "<p style='font-size:12px;color:#555;margin-top:8px'>
+                      Recomendación: entra 5 minutos antes, y verifica micrófono y cámara con antelación.
+                    </p>
+                </div>";
+            }
+        }
+
+        // Diseño
         $mail->Body = "
         <div style='max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#f4f6f9;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
             <div style='background:#2c3e50;color:#fff;padding:20px;text-align:center;'>
@@ -47,6 +73,8 @@ function enviarCorreoCita($correoDestino, $nombrePaciente, $datosCita, $creadoPo
                 <p style='font-size:16px;margin-bottom:10px;'><strong>📄 Tipo:</strong> {$tipoCita}</p>
                 <p style='font-size:16px;margin-bottom:10px;'><strong>🚦 Prioridad:</strong> {$prioridad}</p>
                 <p style='font-size:16px;margin-bottom:20px;'><strong>📝 Motivo:</strong> {$motivo}</p>
+
+                {$bloqueTele}
 
                 <div style='border-top:1px solid #ccc;padding-top:15px;margin-top:20px;'>
                     <p style='font-size:14px;color:#555;'><strong>✉️ Registrado por:</strong> {$creadoPor}</p>

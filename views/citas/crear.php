@@ -156,10 +156,21 @@ textarea {
         <input type="hidden" name="hora_cita" id="hora_cita">
         <input type="hidden" name="estado_id" value="1" />
 
+        <input type="hidden" name="es_online" id="es_online" value="0">
+
         <div style="margin-top: 20px;">
             <button type="submit" class="btn btn-primary">Guardar Cita</button>
+
+            <button type="button" class="btn btn-primary" 
+                    onclick="document.getElementById('es_online').value='1';
+                            document.querySelector('[name=origen_id]').value='4'; /* id de Telemedicina */
+                            document.getElementById('form-cita').submit();">
+                Agendar Cita en Línea
+            </button>
+
             <a href="index.php?vista=<?= base64_encode('citas_medicas/listar') ?>" class="btn btn-secondary">Cancelar</a>
         </div>
+
     </form>
 
     <!-- Calendario y Horas -->

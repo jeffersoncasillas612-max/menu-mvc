@@ -357,6 +357,35 @@ class Cita {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    //Telecita
+
+    public function crearTelecita($cita_id, $meeting_url, $triage_token) {
+        $sql = "INSERT INTO telecita (cita_id, meeting_url, triage_token) 
+                VALUES (:cita_id, :meeting_url, :triage_token)";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            ':cita_id' => $cita_id,
+            ':meeting_url' => $meeting_url,
+            ':triage_token' => $triage_token
+        ]);
+    }
+
+    public function obtenerTelecitaPorToken($token) {
+        $sql = "SELECT t.*, c.fecha, c.paciente_id, c.medico_id
+                FROM telecita t
+                INNER JOIN cita c ON c.cita_id = t.cita_id
+                WHERE t.triage_token = :token";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':token' => $token]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function marcarTriajeCompletado($cita_id) {
+        $sql = "UPDATE telecita SET triage_status='completado', updated_at=NOW()
+                WHERE cita_id=:cita_id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([':cita_id' => $cita_id]);
+    }
 
 
 

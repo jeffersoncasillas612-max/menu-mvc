@@ -25,10 +25,10 @@ class CitaController {
     public function guardar() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once 'models/Cita.php';
-            require_once 'libs/correo_cita.php'; // ⚠️ asegurarse que este archivo exista
-    
+            require_once 'libs/correo_cita.php'; // Asegúrate que este archivo exista
+
             $modelo = new Cita();
-    
+
             $paciente_id       = $_POST['paciente_id'] ?? null;
             $medico_id         = $_POST['medico_id'] ?? null;
             $especialidad_id   = $_POST['especialidad_id'] ?? null;
@@ -38,17 +38,20 @@ class CitaController {
             $rol               = $_SESSION['usuario']['rol_id'] ?? null;
             $origen_id         = ($rol == 30) ? 3 : ($_POST['origen_id'] ?? null);
             $estado_id         = $_POST['estado_id'] ?? 1;
-    
+
             $fecha             = $_POST['fecha_cita'] ?? null;
             $hora              = $_POST['hora_cita'] ?? null;
-    
+
+            // NUEVO (opcional): viene desde un segundo botón "Agendar Cita en Línea"
+            $es_online         = isset($_POST['es_online']) && $_POST['es_online'] == '1';
+
             if ($paciente_id && $medico_id && $especialidad_id && $tipo_cita_id &&
                 $prioridad_id && $origen_id && $fecha && $hora && $motivo) {
-    
+
                 $formato_24h = date('H:i', strtotime($hora));
                 $fecha_hora  = $fecha . ' ' . $formato_24h . ':00';
                 $turno_id    = $modelo->obtenerTurnoId($medico_id, $fecha);
-    
+
                 $resultado = $modelo->guardarCita([
                     'paciente_id'     => $paciente_id,
                     'medico_id'       => $medico_id,
@@ -61,26 +64,48 @@ class CitaController {
                     'estado_id'       => $estado_id,
                     'turno_id'        => $turno_id
                 ]);
-    
+
                 if ($resultado) {
-                    // 🔔 Enviar correo directamente
-                    $cita_id = $modelo->conn->lastInsertId();
-                    $detalle = $modelo->obtenerDetalleCita($cita_id);
+                    $cita_id  = $modelo->conn->lastInsertId();
+                    $detalle  = $modelo->obtenerDetalleCita($cita_id);
                     $paciente = $modelo->obtenerInformacionPaciente($paciente_id);
-    
+
                     $nombrePaciente = $paciente['usu_nombre'] . ' ' . $paciente['usu_apellido'];
                     $correoPaciente = $paciente['usu_correo'];
-    
+
                     $creadoPor = ($rol == 30)
                         ? 'Cita registrada por usted mismo desde la plataforma web.'
                         : 'Cita registrada por el personal: ' . $_SESSION['usuario']['usu_nombre'] . ' ' . $_SESSION['usuario']['usu_apellido'];
-    
-                    enviarCorreoCita($correoPaciente, $nombrePaciente, $detalle, $creadoPor);
-    
+
+                    // Si es cita en línea, generamos enlaces adicionales (NO rompe si no existe la tabla/función)
+                    $tele = null;
+                    if ($es_online) {
+                        try {
+                            $room     = 'hospital-' . $cita_id . '-' . bin2hex(random_bytes(5));
+                            $meetUrl  = 'https://meet.jit.si/' . $room;
+                            $token    = bin2hex(random_bytes(24));
+                            // Si tienes método en tu modelo, lo usas; si no, no pasa nada.
+                            if (method_exists($modelo, 'crearTelecita')) {
+                                $modelo->crearTelecita($cita_id, $meetUrl, $token);
+                            }
+                            // URL pública de triaje (ajusta dominio/ruta cuando la tengas lista)
+                            $tele = [
+                                'meeting_url' => $meetUrl,
+                                'triage_url'  => 'http://localhost:4060/MenuMVC/views/tele/triage.php?token=' . $token
+                            ];
+                        } catch (\Throwable $e) {
+                            // No detengas el flujo si algo de "tele" falla
+                            error_log('Telecita no creada: ' . $e->getMessage());
+                        }
+                    }
+
+                    // Envía el correo (la función acepta el 5º parámetro opcional)
+                    enviarCorreoCita($correoPaciente, $nombrePaciente, $detalle, $creadoPor, $tele);
+
                     $urlRedireccion = ($rol == 30)
                         ? 'index.php?vista=' . base64_encode('citas/mis_citas.php')
                         : 'index.php?vista=' . base64_encode('citas/listar.php');
-    
+
                     echo "
                     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
                     <script>
@@ -100,15 +125,16 @@ class CitaController {
                     $_SESSION['error'] = 'No se pudo guardar la cita.';
                 }
             }
-    
+
             $_SESSION['error'] = 'Faltan datos para registrar la cita.';
             header("Location: index.php?vista=" . base64_encode('citas/listar.php'));
             exit;
         }
-    
+
         header('Location: index.php?c=' . base64_encode('cita') . '&a=' . base64_encode('crear'));
         exit;
     }
+
     
     
 
