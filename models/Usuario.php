@@ -149,6 +149,33 @@ class Usuario {
     }
 
 
+    public function crearYRetornarId($nombre, $apellido, $correo, $cedula, $rol_id, $especialidad_id = null): int {
+        $contrasena = hash('sha256', $cedula);
+
+        $sql = "INSERT INTO usuarios 
+                (usu_nombre, usu_apellido, usu_correo, usu_contrasena, usu_cedula, rol_id, especialidad_id, usu_primera_vez, usu_estado)
+                VALUES 
+                (:nombre, :apellido, :correo, :contrasena, :cedula, :rol_id, :especialidad_id, 1, 1)";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':apellido', $apellido);
+        $stmt->bindParam(':correo', $correo);
+        $stmt->bindParam(':contrasena', $contrasena);
+        $stmt->bindParam(':cedula', $cedula);
+        $stmt->bindParam(':rol_id', $rol_id, PDO::PARAM_INT);
+
+        if ($especialidad_id === null) {
+            $stmt->bindValue(':especialidad_id', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindValue(':especialidad_id', (int)$especialidad_id, PDO::PARAM_INT);
+        }
+
+        if (!$stmt->execute()) {
+            return 0;
+        }
+        return (int)$this->conn->lastInsertId();
+    }
 
     
     
