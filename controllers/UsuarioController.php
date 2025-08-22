@@ -6,14 +6,12 @@ class UsuarioController {
     public function guardar() {
         $usuario = new Usuario();
 
-        $nombre = $_POST['nombre'];
-        $apellido = $_POST['apellido'];
-        $correo = $_POST['correo'];
-        $cedula = $_POST['cedula'];
-        $rol_id = $_POST['rol_id'];
+        $nombre          = $_POST['nombre'];
+        $apellido        = $_POST['apellido'];
+        $correo          = $_POST['correo'];
+        $cedula          = $_POST['cedula'];
+        $rol_id          = $_POST['rol_id'];
         $especialidad_id = !empty($_POST['especialidad_id']) ? $_POST['especialidad_id'] : null;
-
-
 
         $urlRedireccion = 'index.php?vista=' . base64_encode('usuarios/crear.php');
 
@@ -47,8 +45,9 @@ class UsuarioController {
         $resultado = $usuario->crear($nombre, $apellido, $correo, $cedula, $rol_id, $especialidad_id);
 
         if ($resultado) {
-            // Enviar correo de bienvenida
-            enviarCorreoBienvenida($correo, $nombre, $cedula);
+            // 👇 IMPORTANTE: pasar 4 parámetros en este orden
+            // (correo, nombre, apellido, contraseñaTemporal=cedula)
+            enviarCorreoBienvenida($correo, $nombre, $apellido, $cedula);
 
             echo "
             <!DOCTYPE html>
@@ -92,6 +91,7 @@ class UsuarioController {
             </html>";
         }
     }
+
 
 
     public function cambiarClave() {
