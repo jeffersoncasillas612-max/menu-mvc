@@ -22,7 +22,7 @@ try {
 
     if (!is_array($body) || !isset($body['medico_id'])) {
         http_response_code(400);
-        echo json_encode(['estado'=>'error','mensaje'=>'Falta medico_id en el body']);
+        echo json_encode(['estado'=>'error','mensaje'=>'Falt    a medico_id en el body']);
         exit;
     }
 
