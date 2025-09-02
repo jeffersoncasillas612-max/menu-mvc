@@ -284,11 +284,37 @@ class Cita {
 
     public function registrarConsulta($data)
     {
-        $sql = "INSERT INTO consulta (cita_id, diagnostico, tratamiento, fecha)
-                VALUES (:cita_id, :diagnostico, :tratamiento, :fecha)";
+        $sql = "INSERT INTO consulta (
+                    cita_id, diagnostico, tratamiento, fecha,
+                    trat_nombre, trat_descripcion, trat_fecha_inicio, trat_frecuencia_text,
+                    trat_sesiones_totales, trat_sesiones_realizadas, trat_duracion_dias,
+                    trat_dosis, trat_via_administracion, trat_observaciones, trat_estado
+                ) VALUES (
+                    :cita_id, :diagnostico, :tratamiento, :fecha,
+                    :trat_nombre, :trat_descripcion, :trat_fecha_inicio, :trat_frecuencia_text,
+                    :trat_sesiones_totales, :trat_sesiones_realizadas, :trat_duracion_dias,
+                    :trat_dosis, :trat_via_administracion, :trat_observaciones, :trat_estado
+                )";
         $stmt = $this->conn->prepare($sql);
-        return $stmt->execute($data);
+        return $stmt->execute([
+            ':cita_id'                  => $data['cita_id'],
+            ':diagnostico'              => $data['diagnostico'] ?? null,
+            ':tratamiento'              => $data['tratamiento'] ?? null, // texto libre (compatibilidad)
+            ':fecha'                    => $data['fecha'] ?? date('Y-m-d'),
+            ':trat_nombre'              => $data['trat_nombre'] ?? null,
+            ':trat_descripcion'         => $data['trat_descripcion'] ?? null,
+            ':trat_fecha_inicio'        => $data['trat_fecha_inicio'] ?? null,
+            ':trat_frecuencia_text'     => $data['trat_frecuencia_text'] ?? null,
+            ':trat_sesiones_totales'    => $data['trat_sesiones_totales'] ?? null,
+            ':trat_sesiones_realizadas' => $data['trat_sesiones_realizadas'] ?? 0,
+            ':trat_duracion_dias'       => $data['trat_duracion_dias'] ?? null,
+            ':trat_dosis'               => $data['trat_dosis'] ?? null,
+            ':trat_via_administracion'  => $data['trat_via_administracion'] ?? null,
+            ':trat_observaciones'       => $data['trat_observaciones'] ?? null,
+            ':trat_estado'              => $data['trat_estado'] ?? 'activo',
+        ]);
     }
+
 
     public function guardarFactura($paciente_id, $cita_id, $total)
     {
